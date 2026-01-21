@@ -66,6 +66,10 @@
 #define MAC_CLOSE  LG(W)
 #define MAC_TAB_L  LG(LS(LBKT))
 #define MAC_TAB_R  LG(LS(RBKT))
+#define MAC_SCRN   LG(LS(N4))      // Screenshot selection (Cmd+Shift+4)
+#define MAC_SCRN_F LG(LS(N3))      // Screenshot full (Cmd+Shift+3)
+#define MAC_RAYC   LG(SPACE)       // Raycast (Cmd+Space)
+#define MAC_MACCY  LG(LS(C))       // Maccy clipboard (Cmd+Shift+C)
 
 / {
     /* ========================================
@@ -175,6 +179,15 @@
             bindings = <&kp SQT>, <&kp DQT>;
             mods = <(MOD_LSFT|MOD_RSFT)>;
         };
+
+        /* Minus (tap) → Em-dash (hold) - Mac em-dash is Shift+Alt+Minus */
+        minus_emdash: minus_emdash {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&kp>, <&kp>;
+        };
     };
 
     /* ========================================
@@ -279,6 +292,24 @@
             tap-ms = <10>;
             bindings = <&kp LS(I) &kp LS(O) &kp DOT &kp I &kp N &kp S &kp P &kp E &kp C &kp T &kp LPAR>;
         };
+
+        /* Em-dash — (Mac: Shift+Alt+Minus) */
+        emdash: emdash {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <10>;
+            tap-ms = <10>;
+            bindings = <&kp LS(LA(MINUS))>;
+        };
+
+        /* En-dash – (Mac: Alt+Minus) */
+        endash: endash {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <10>;
+            tap-ms = <10>;
+            bindings = <&kp LA(MINUS)>;
+        };
     };
 
     /* ========================================
@@ -311,10 +342,10 @@
             layers = <COLEMAK>;
         };
 
-        /* Mouse layer toggle */
+        /* Mouse layer toggle: X + C */
         combo_mouse {
             timeout-ms = <50>;
-            key-positions = <25 26>;
+            key-positions = <26 27>;
             bindings = <&tog MOUSE>;
             layers = <COLEMAK MOUSE>;
         };
@@ -397,6 +428,62 @@
             bindings = <&tmpl_lit>;
             layers = <COLEMAK>;
         };
+
+        /* Raycast: G + M (inner columns) */
+        combo_raycast {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <17 18>;
+            bindings = <&kp MAC_RAYC>;
+            layers = <COLEMAK>;
+        };
+
+        /* Maccy clipboard: C + D */
+        combo_maccy {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <27 28>;
+            bindings = <&kp MAC_MACCY>;
+            layers = <COLEMAK>;
+        };
+
+        /* Screenshot selection: W + F */
+        combo_screenshot {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <2 3>;
+            bindings = <&kp MAC_SCRN>;
+            layers = <COLEMAK>;
+        };
+
+        /* Em-dash: , + . */
+        combo_emdash {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <32 33>;
+            bindings = <&emdash>;
+            layers = <COLEMAK>;
+        };
+
+        /* Copy: Quick access D + V */
+        combo_copy {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <28 29>;
+            bindings = <&kp MAC_COPY>;
+            layers = <COLEMAK>;
+        };
+
+        /* Paste: Quick access C + V */
+        combo_paste {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <27 29>;
+            bindings = <&kp MAC_PASTE>;
+            layers = <COLEMAK>;
+        };
+
+        /* Undo: Z + X */
+        combo_undo {
+            timeout-ms = <COMBO_TERM>;
+            key-positions = <25 26>;
+            bindings = <&kp MAC_UNDO>;
+            layers = <COLEMAK NAV>;
+        };
     };
 
     /* ========================================
@@ -459,9 +546,9 @@
          * Layer 1: NAV (Navigation - Neovim style)
          * ----------------------------------------
          * ╭──────┬──────┬──────┬──────┬──────┬──────╮   ╭──────┬──────┬──────┬──────┬──────┬──────╮
-         * │      │ QUIT │CLOSE │ FIND │      │      │   │ REDO │PASTE │ COPY │ CUT  │ UNDO │ DEL  │
+         * │      │ QUIT │CLOSE │ FIND │SCRN  │RAYC  │   │ REDO │PASTE │ COPY │ CUT  │ UNDO │ DEL  │
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
-         * │      │ GUI  │ ALT  │ CTRL │SHIFT │      │   │  ←   │  ↓   │  ↑   │  →   │ DEL  │      │
+         * │      │ GUI  │ ALT  │ CTRL │SHIFT │MACCY │   │  ←   │  ↓   │  ↑   │  →   │ DEL  │      │
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
          * │      │ SELAL│ SAVE │TAB_L │TAB_R │      │   │ HOME │ PGDN │ PGUP │ END  │ INS  │      │
          * ╰──────┴──────┴──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┴──────┴──────┴──────╯
@@ -474,9 +561,9 @@
             display-name = "NAV";
             bindings = <
         // ╭──────────────┬──────────────┬──────────────┬──────────────┬──────────────┬──────────────╮   ╭──────────────┬──────────────┬──────────────┬──────────────┬──────────────┬──────────────╮
-            &trans         &kp MAC_QUIT   &kp MAC_CLOSE  &kp MAC_FIND   &trans         &trans             &kp MAC_REDO   &kp MAC_PASTE  &kp MAC_COPY   &kp MAC_CUT    &kp MAC_UNDO   &kp DEL
+            &trans         &kp MAC_QUIT   &kp MAC_CLOSE  &kp MAC_FIND   &kp MAC_SCRN   &kp MAC_RAYC       &kp MAC_REDO   &kp MAC_PASTE  &kp MAC_COPY   &kp MAC_CUT    &kp MAC_UNDO   &kp DEL
         // ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-            &trans         &skq LGUI      &skq LALT      &skq LCTRL     &skq LSHFT     &trans             &kp LEFT       &kp DOWN       &kp UP         &kp RIGHT      &kp DEL        &trans
+            &trans         &skq LGUI      &skq LALT      &skq LCTRL     &skq LSHFT     &kp MAC_MACCY      &kp LEFT       &kp DOWN       &kp UP         &kp RIGHT      &kp DEL        &trans
         // ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
             &trans         &kp MAC_SELALL &kp MAC_SAVE   &kp MAC_TAB_L  &kp MAC_TAB_R  &trans             &kp HOME       &kp PG_DN      &kp PG_UP      &kp END        &kp INS        &trans
         // ╰──────────────┴──────────────┴──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┴──────────────┴──────────────┴──────────────╯
@@ -493,10 +580,12 @@
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
          * │  ~   │ F1   │ F2   │ F3   │ F4   │ F5   │   │ F6   │ F7   │ F8   │ F9   │ F10  │      │
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
-         * │      │ F11  │ F12  │      │      │      │   │  -   │  =   │  ,   │  .   │  /   │      │
+         * │      │ F11  │ F12  │  –   │  —   │      │   │ -/—  │  =   │  ,   │  .   │  /   │      │
          * ╰──────┴──────┴──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┴──────┴──────┴──────╯
          *                      │ #### │      │      │   │      │      │      │
          *                      ╰──────┴──────┴──────╯   ╰──────┴──────┴──────╯
+         * 
+         * Note: Minus key (hold) = Em-dash (—), also en-dash (–) available
          */
         num_layer {
             display-name = "NUM";
@@ -506,7 +595,7 @@
         // ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
             &kp TILDE      &kp F1         &kp F2         &kp F3         &kp F4         &kp F5             &kp F6         &kp F7         &kp F8         &kp F9         &kp F10        &trans
         // ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┼──────────────┼──────────────┼──────────────┤
-            &trans         &kp F11        &kp F12        &trans         &trans         &trans             &kp MINUS      &kp EQUAL      &kp COMMA      &kp DOT        &kp FSLH       &trans
+            &trans         &kp F11        &kp F12        &endash        &emdash        &trans             &minus_emdash LS(LA(MINUS)) MINUS  &kp EQUAL  &kp COMMA      &kp DOT        &kp FSLH       &trans
         // ╰──────────────┴──────────────┴──────────────┼──────────────┼──────────────┼──────────────┤   ├──────────────┼──────────────┼──────────────┴──────────────┴──────────────┴──────────────╯
                                                          &trans         &trans         &trans             &trans         &trans         &trans
         //                                              ╰──────────────┴──────────────┴──────────────╯   ╰──────────────┴──────────────┴──────────────╯
@@ -580,31 +669,31 @@
          * Your familiar shortcuts from Sofle preserved
          * Access: Hold right outer thumb OR NUM + SYM
          * ╭──────┬──────┬──────┬──────┬──────┬──────╮   ╭──────┬──────┬──────┬──────┬──────┬──────╮
-         * │      │ ⌃1   │ ⌃2   │ ⌃3   │ ⌃4   │ ⌃5   │   │ ⌃6   │ ⌃7   │ ⌃8   │ ⌃9   │ ⌃0   │      │  Switch space
+         * │      │⌃1/⌥⇧1│⌃2/⌥⇧2│⌃3/⌥⇧3│⌃4/⌥⇧4│⌃5/⌥⇧5│   │⌃6/⌥⇧6│⌃7/⌥⇧7│⌃8/⌥⇧8│⌃9/⌥⇧9│⌃0/⌥⇧0│      │
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
-         * │      │⌥⇧H  │⌥⇧J  │⌥⇧K  │⌥⇧L  │      │   │⌥H/⌥⌃H│⌥J/⌥⌃J│⌥K/⌥⌃K│⌥L/⌥⌃L│      │      │  Move/Focus/Resize
+         * │      │⌥⇧H  │⌥⇧J  │⌥⇧K  │⌥⇧L  │      │   │⌥H/⌥⌃H│⌥J/⌥⌃J│⌥K/⌥⌃K│⌥L/⌥⌃L│      │      │
          * ├──────┼──────┼──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┼──────┼──────┼──────┤
          * │      │ ⌥E   │      │⌥⇧B  │⌥⇧T  │⌥S/⌥⇧S│   │⌥G/⌥⇧G│⌥⇧M  │ ⌥X   │      │      │      │
          * ╰──────┴──────┴──────┼──────┼──────┼──────┤   ├──────┼──────┼──────┴──────┴──────┴──────╯
          *                      │      │      │      │   │      │      │ #### │
          *                      ╰──────┴──────┴──────╯   ╰──────┴──────┴──────╯
          * 
-         * Row 1: Ctrl+N switches to space N
+         * Top Row: Tap = Ctrl+N (switch to space N) / Hold = Alt+Shift+N (move window to space N)
          * Row 2 Left: Alt+Shift+HJKL moves windows
          * Row 2 Right: Alt+HJKL focuses (tap) / Alt+Ctrl+HJKL resizes (hold)
          */
         aero_layer {
             display-name = "AERO";
             bindings = <
-        // ╭─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────╮   ╭─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────┬─────────────────────╮
-            &trans                &kp LC(N1)            &kp LC(N2)            &kp LC(N3)            &kp LC(N4)            &kp LC(N5)                &kp LC(N6)            &kp LC(N7)            &kp LC(N8)            &kp LC(N9)            &kp LC(N0)            &trans
-        // ├─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┤   ├─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┤
-            &trans                &kp LS(LA(H))         &kp LS(LA(J))         &kp LS(LA(K))         &kp LS(LA(L))         &trans                    &mt LC(LA(H)) LA(H)   &mt LC(LA(J)) LA(J)   &mt LC(LA(K)) LA(K)   &mt LC(LA(L)) LA(L)   &trans                &trans
-        // ├─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┤   ├─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┤
-            &trans                &kp LA(E)             &trans                &kp LS(LA(B))         &kp LS(LA(T))         &mt LS(LA(S)) LA(S)       &mt LS(LA(G)) LA(G)   &kp LS(LA(M))         &kp LA(X)             &trans                &trans                &trans
-        // ╰─────────────────────┴─────────────────────┴─────────────────────┼─────────────────────┼─────────────────────┼─────────────────────┤   ├─────────────────────┼─────────────────────┼─────────────────────┴─────────────────────┴─────────────────────┴─────────────────────╯
-                                                                              &trans                &trans                &trans                    &trans                &trans                &trans
-        //                                                                   ╰─────────────────────┴─────────────────────┴─────────────────────╯   ╰─────────────────────┴─────────────────────┴─────────────────────╯
+        // ╭─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────╮   ╭─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────┬─────────────────────────────╮
+            &trans                        &mt LS(LA(N1)) LC(N1)         &mt LS(LA(N2)) LC(N2)         &mt LS(LA(N3)) LC(N3)         &mt LS(LA(N4)) LC(N4)         &mt LS(LA(N5)) LC(N5)             &mt LS(LA(N6)) LC(N6)         &mt LS(LA(N7)) LC(N7)         &mt LS(LA(N8)) LC(N8)         &mt LS(LA(N9)) LC(N9)         &mt LS(LA(N0)) LC(N0)         &trans
+        // ├─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤   ├─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤
+            &trans                        &kp LS(LA(H))                 &kp LS(LA(J))                 &kp LS(LA(K))                 &kp LS(LA(L))                 &trans                            &mt LC(LA(H)) LA(H)           &mt LC(LA(J)) LA(J)           &mt LC(LA(K)) LA(K)           &mt LC(LA(L)) LA(L)           &trans                        &trans
+        // ├─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤   ├─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤
+            &trans                        &kp LA(E)                     &trans                        &kp LS(LA(B))                 &kp LS(LA(T))                 &mt LS(LA(S)) LA(S)               &mt LS(LA(G)) LA(G)           &kp LS(LA(M))                 &kp LA(X)                     &trans                        &trans                        &trans
+        // ╰─────────────────────────────┴─────────────────────────────┴─────────────────────────────┼─────────────────────────────┼─────────────────────────────┼─────────────────────────────┤   ├─────────────────────────────┼─────────────────────────────┼─────────────────────────────┴─────────────────────────────┴─────────────────────────────┴─────────────────────────────╯
+                                                                                                      &trans                        &trans                        &trans                            &trans                        &trans                        &trans
+        //                                                                                           ╰─────────────────────────────┴─────────────────────────────┴─────────────────────────────╯   ╰─────────────────────────────┴─────────────────────────────┴─────────────────────────────╯
             >;
         };
 
